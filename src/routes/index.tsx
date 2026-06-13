@@ -15,6 +15,7 @@ import edit2 from "@/assets/edit-2.jpg";
 import edit3 from "@/assets/edit-3.jpg";
 import startingVideo from "@/assets/starting.mp4.asset.json";
 import endsceneVideo from "@/assets/endscene.mp4.asset.json";
+import scene2Video from "@/assets/scene2.mp4.asset.json";
 
 export const Route = createFileRoute("/")({
   component: Luxeholic,
