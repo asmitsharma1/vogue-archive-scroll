@@ -85,70 +85,118 @@ function Nav() {
 
 function Hero() {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const v1Ref = useRef<HTMLVideoElement>(null);
+  const v2Ref = useRef<HTMLVideoElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+
+  // Crossfade between the two videos around the midpoint
+  const v1Opacity = useTransform(scrollYProgress, [0, 0.48, 0.55], [1, 1, 0]);
+  const v2Opacity = useTransform(scrollYProgress, [0.48, 0.55, 1], [0, 1, 1]);
+  // Content fades in only at the very end
+  const contentOpacity = useTransform(scrollYProgress, [0.7, 0.92], [0, 1]);
+  const contentY = useTransform(scrollYProgress, [0.7, 0.95], [40, 0]);
+  const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
+
+  // Scroll-scrub the videos. Each video covers half the scroll range.
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on("change", (p) => {
+      const v1 = v1Ref.current;
+      const v2 = v2Ref.current;
+      if (v1 && v1.duration && !isNaN(v1.duration)) {
+        const t = Math.min(1, p / 0.5) * v1.duration;
+        if (Math.abs(v1.currentTime - t) > 0.03) {
+          try { v1.currentTime = t; } catch {}
+        }
+      }
+      if (v2 && v2.duration && !isNaN(v2.duration)) {
+        const t = Math.max(0, (p - 0.5) / 0.5) * v2.duration;
+        if (Math.abs(v2.currentTime - t) > 0.03) {
+          try { v2.currentTime = t; } catch {}
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress]);
+
   return (
-    <section ref={ref} id="top" className="relative h-screen w-full overflow-hidden bg-noir">
-      <motion.div style={{ scale, y }} className="absolute inset-0">
-        <img src={heroImg} alt="Luxeholic editorial" className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-noir/70 via-noir/20 to-noir/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-noir/60 to-transparent" />
-      </motion.div>
-      <motion.div style={{ opacity }} className="relative z-10 flex h-full flex-col">
-        <div className="flex-1" />
-        <div className="mx-auto w-full max-w-[1600px] px-6 pb-24 md:px-10 md:pb-32 text-ivory">
+    <section ref={ref} id="top" className="relative w-full bg-noir" style={{ height: "320vh" }}>
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        <motion.video
+          ref={v1Ref}
+          src={startingVideo.url}
+          muted
+          playsInline
+          preload="auto"
+          style={{ opacity: v1Opacity }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <motion.video
+          ref={v2Ref}
+          src={endsceneVideo.url}
+          muted
+          playsInline
+          preload="auto"
+          style={{ opacity: v2Opacity }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+
+        {/* Cinematic vignette + brand wash */}
+        <div className="absolute inset-0 bg-gradient-to-b from-noir/40 via-transparent to-noir/85 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-noir/40 via-transparent to-noir/30 pointer-events-none" />
+
+        {/* Top brand line — always visible */}
+        <div className="absolute top-32 left-0 right-0 z-10 text-center px-6">
           <motion.p
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.4 }}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.6 }}
             className="eyebrow text-gold"
           >
             The House of Luxeholic · Est. 1990
           </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 font-serif text-[18vw] leading-[0.9] tracking-tight md:text-[10rem] text-balance"
-          >
-            Luxury, <span className="italic shimmer-text">Curated</span>.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.1 }}
-            className="mt-8 max-w-xl text-sm md:text-base font-light text-ivory/80 leading-relaxed"
-          >
-            Discover timeless handbags, fashion essentials, and designer-inspired
-            collections — composed for the modern connoisseur.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1.3 }}
-            className="mt-10 flex flex-wrap items-center gap-6"
-          >
-            <a href="#handbags" className="group relative inline-flex items-center gap-3 border border-ivory/40 bg-ivory/5 backdrop-blur-sm px-9 py-4 text-xs tracking-[0.3em] uppercase text-ivory transition-all hover:bg-ivory hover:text-noir">
-              Shop Collection
-              <span className="transition-transform group-hover:translate-x-1">→</span>
-            </a>
-            <a href="#world" className="text-xs tracking-[0.3em] uppercase text-ivory/70 hover:text-gold transition">
-              Discover the House
-            </a>
-          </motion.div>
         </div>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-ivory/60"
-      >
-        <span className="text-[10px] tracking-[0.4em] uppercase">Scroll</span>
-        <motion.span
-          animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}
-          className="block h-8 w-px bg-gradient-to-b from-gold to-transparent"
-        />
-      </motion.div>
+
+        {/* End-of-scroll content reveal */}
+        <motion.div
+          style={{ opacity: contentOpacity, y: contentY }}
+          className="absolute inset-0 z-10 flex items-end"
+        >
+          <div className="mx-auto w-full max-w-[1600px] px-6 pb-20 md:px-10 md:pb-28 text-ivory">
+            <h1 className="font-serif text-[16vw] leading-[0.9] tracking-tight md:text-[9rem] text-balance">
+              Luxury, <span className="italic shimmer-text">Curated</span>.
+            </h1>
+            <p className="mt-6 max-w-xl text-sm md:text-base font-light text-ivory/80 leading-relaxed">
+              Discover timeless handbags, fashion essentials, and designer-inspired
+              collections — composed for the modern connoisseur.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-6">
+              <a href="#handbags" className="group relative inline-flex items-center gap-3 border border-ivory/40 bg-ivory/5 backdrop-blur-sm px-9 py-4 text-xs tracking-[0.3em] uppercase text-ivory transition-all hover:bg-ivory hover:text-noir">
+                Shop Collection
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </a>
+              <a href="#world" className="text-xs tracking-[0.3em] uppercase text-ivory/70 hover:text-gold transition">
+                Discover the House
+              </a>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Scroll hint */}
+        <motion.div
+          style={{ opacity: scrollHintOpacity }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-ivory/70"
+        >
+          <span className="text-[10px] tracking-[0.4em] uppercase">Scroll to Reveal</span>
+          <motion.span
+            animate={{ y: [0, 10, 0] }} transition={{ duration: 1.8, repeat: Infinity }}
+            className="block h-10 w-px bg-gradient-to-b from-gold to-transparent"
+          />
+        </motion.div>
+      </div>
     </section>
   );
 }
+
+
 
 function Marquee() {
   const items = ["Worldwide Shipping", "Complimentary Returns", "Atelier Craftsmanship", "Private Concierge", "Members-Only Drops"];
