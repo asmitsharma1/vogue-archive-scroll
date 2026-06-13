@@ -630,6 +630,80 @@ function Footer() {
   );
 }
 
+function CinematicScene({
+  src,
+  eyebrow,
+  title,
+  italic,
+  body,
+  cta,
+  href = "#",
+}: {
+  src: string;
+  eyebrow: string;
+  title: string;
+  italic: string;
+  body: string;
+  cta: string;
+  href?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const vRef = useRef<HTMLVideoElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
+
+  const titleOpacity = useTransform(scrollYProgress, [0.05, 0.25, 0.75, 0.95], [0, 1, 1, 0]);
+  const titleY = useTransform(scrollYProgress, [0.05, 0.3], [60, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1.1, 1]);
+
+  useEffect(() => {
+    const unsub = scrollYProgress.on("change", (p) => {
+      const v = vRef.current;
+      if (v && v.duration && !isNaN(v.duration)) {
+        const t = Math.max(0, Math.min(1, p)) * v.duration;
+        if (Math.abs(v.currentTime - t) > 0.03) {
+          try { v.currentTime = t; } catch {}
+        }
+      }
+    });
+    return () => unsub();
+  }, [scrollYProgress]);
+
+  return (
+    <section ref={ref} className="relative w-full bg-noir" style={{ height: "260vh" }}>
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        <motion.video
+          ref={vRef}
+          src={src}
+          muted
+          playsInline
+          preload="auto"
+          style={{ scale }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-noir/50 via-noir/10 to-noir/80 pointer-events-none" />
+        <motion.div
+          style={{ opacity: titleOpacity, y: titleY }}
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center text-ivory px-6"
+        >
+          <p className="eyebrow text-gold">{eyebrow}</p>
+          <h2 className="mt-6 font-serif text-[14vw] md:text-[8rem] leading-[0.9] tracking-tight text-balance">
+            {title} <span className="italic shimmer-text">{italic}</span>
+          </h2>
+          <p className="mt-8 max-w-xl text-sm md:text-base font-light text-ivory/75 leading-relaxed">
+            {body}
+          </p>
+          <a
+            href={href}
+            className="mt-10 group inline-flex items-center gap-3 border border-ivory/40 bg-ivory/5 backdrop-blur-sm px-9 py-4 text-xs tracking-[0.3em] uppercase hover:bg-ivory hover:text-noir transition"
+          >
+            {cta} <span className="transition-transform group-hover:translate-x-1">→</span>
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
