@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, useScroll, useTransform, useSpring } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import heroImg from "@/assets/hero.jpg";
+
 import catWomen from "@/assets/cat-women.jpg";
 import catMen from "@/assets/cat-men.jpg";
 import catBags from "@/assets/cat-bags.jpg";
