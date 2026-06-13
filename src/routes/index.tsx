@@ -725,6 +725,15 @@ function Luxeholic() {
         <Marquee />
         <Categories />
         <SignatureCollection />
+        <CinematicScene
+          src={scene2Video.url}
+          eyebrow="The Atelier Film"
+          title="Crafted in"
+          italic="motion."
+          body="A study of light, leather, and the human hand — the Luxeholic atelier captured frame by frame."
+          cta="Discover the House"
+          href="#world"
+        />
         <EditGrid />
         <WorldOf />
         <Journal />
