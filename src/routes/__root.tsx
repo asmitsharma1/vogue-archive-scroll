@@ -9,6 +9,11 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { AuthProvider } from "@/context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
+import { CurrencyProvider } from "@/context/CurrencyContext";
+import { StoreProvider } from "@/context/StoreContext";
+import heroImage from "../assets/hero.jpg";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -78,11 +83,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Luxeholic — Luxury, Curated." },
-      { name: "description", content: "Discover timeless handbags, fashion essentials, and designer-inspired collections at Luxeholic." },
+      {
+        name: "description",
+        content:
+          "Discover timeless handbags, fashion essentials, and designer-inspired collections at Luxeholic.",
+      },
       { property: "og:title", content: "Luxeholic — Luxury, Curated." },
-      { property: "og:description", content: "A modern luxury house for handbags, fashion, and accessories." },
+      {
+        property: "og:description",
+        content: "A modern luxury house for handbags, fashion, and accessories.",
+      },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Luxeholic" },
+      { property: "og:image", content: heroImage },
+      { property: "og:image:alt", content: "Luxeholic luxury fashion campaign" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Luxeholic — Luxury, Curated." },
+      {
+        name: "twitter:description",
+        content:
+          "Discover timeless handbags, fashion essentials, and designer-inspired collections at Luxeholic.",
+      },
+      { name: "twitter:image", content: heroImage },
+      { name: "pinterest-rich-pin", content: "true" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -119,8 +142,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <StoreProvider>
+        <CurrencyProvider>
+          <AuthProvider>
+            <CartProvider>
+              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+              <Outlet />
+            </CartProvider>
+          </AuthProvider>
+        </CurrencyProvider>
+      </StoreProvider>
     </QueryClientProvider>
   );
 }

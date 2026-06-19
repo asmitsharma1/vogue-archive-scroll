@@ -9,38 +9,251 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShopRouteImport } from './routes/shop'
+import { Route as JournalRouteImport } from './routes/journal'
+import { Route as CustomerServiceRouteImport } from './routes/customer-service'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as JournalOurStoryRouteImport } from './routes/journal.our-story'
+import { Route as JournalSlugRouteImport } from './routes/journal.$slug'
+import { Route as CustomerServiceSlugRouteImport } from './routes/customer-service.$slug'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminJournalRouteImport } from './routes/admin.journal'
+import { Route as AdminJournalNewRouteImport } from './routes/admin.journal.new'
+import { Route as AdminJournalIdEditRouteImport } from './routes/admin.journal.$id.edit'
 
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerServiceRoute = CustomerServiceRouteImport.update({
+  id: '/customer-service',
+  path: '/customer-service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopSlugRoute = ShopSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ShopRoute,
+} as any)
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalOurStoryRoute = JournalOurStoryRouteImport.update({
+  id: '/our-story',
+  path: '/our-story',
+  getParentRoute: () => JournalRoute,
+} as any)
+const JournalSlugRoute = JournalSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => JournalRoute,
+} as any)
+const CustomerServiceSlugRoute = CustomerServiceSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CustomerServiceRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminJournalRoute = AdminJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminJournalNewRoute = AdminJournalNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminJournalRoute,
+} as any)
+const AdminJournalIdEditRoute = AdminJournalIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminJournalRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/cart': typeof CartRoute
+  '/customer-service': typeof CustomerServiceRouteWithChildren
+  '/journal': typeof JournalRouteWithChildren
+  '/shop': typeof ShopRouteWithChildren
+  '/admin/journal': typeof AdminJournalRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/customer-service/$slug': typeof CustomerServiceSlugRoute
+  '/journal/$slug': typeof JournalSlugRoute
+  '/journal/our-story': typeof JournalOurStoryRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/shop/$slug': typeof ShopSlugRoute
+  '/admin/journal/new': typeof AdminJournalNewRoute
+  '/admin/journal/$id/edit': typeof AdminJournalIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/cart': typeof CartRoute
+  '/customer-service': typeof CustomerServiceRouteWithChildren
+  '/journal': typeof JournalRouteWithChildren
+  '/shop': typeof ShopRouteWithChildren
+  '/admin/journal': typeof AdminJournalRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/customer-service/$slug': typeof CustomerServiceSlugRoute
+  '/journal/$slug': typeof JournalSlugRoute
+  '/journal/our-story': typeof JournalOurStoryRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/shop/$slug': typeof ShopSlugRoute
+  '/admin/journal/new': typeof AdminJournalNewRoute
+  '/admin/journal/$id/edit': typeof AdminJournalIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/cart': typeof CartRoute
+  '/customer-service': typeof CustomerServiceRouteWithChildren
+  '/journal': typeof JournalRouteWithChildren
+  '/shop': typeof ShopRouteWithChildren
+  '/admin/journal': typeof AdminJournalRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/customer-service/$slug': typeof CustomerServiceSlugRoute
+  '/journal/$slug': typeof JournalSlugRoute
+  '/journal/our-story': typeof JournalOurStoryRoute
+  '/product/$slug': typeof ProductSlugRoute
+  '/shop/$slug': typeof ShopSlugRoute
+  '/admin/journal/new': typeof AdminJournalNewRoute
+  '/admin/journal/$id/edit': typeof AdminJournalIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/cart'
+    | '/customer-service'
+    | '/journal'
+    | '/shop'
+    | '/admin/journal'
+    | '/admin/login'
+    | '/customer-service/$slug'
+    | '/journal/$slug'
+    | '/journal/our-story'
+    | '/product/$slug'
+    | '/shop/$slug'
+    | '/admin/journal/new'
+    | '/admin/journal/$id/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/cart'
+    | '/customer-service'
+    | '/journal'
+    | '/shop'
+    | '/admin/journal'
+    | '/admin/login'
+    | '/customer-service/$slug'
+    | '/journal/$slug'
+    | '/journal/our-story'
+    | '/product/$slug'
+    | '/shop/$slug'
+    | '/admin/journal/new'
+    | '/admin/journal/$id/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/cart'
+    | '/customer-service'
+    | '/journal'
+    | '/shop'
+    | '/admin/journal'
+    | '/admin/login'
+    | '/customer-service/$slug'
+    | '/journal/$slug'
+    | '/journal/our-story'
+    | '/product/$slug'
+    | '/shop/$slug'
+    | '/admin/journal/new'
+    | '/admin/journal/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  CartRoute: typeof CartRoute
+  CustomerServiceRoute: typeof CustomerServiceRouteWithChildren
+  JournalRoute: typeof JournalRouteWithChildren
+  ShopRoute: typeof ShopRouteWithChildren
+  ProductSlugRoute: typeof ProductSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer-service': {
+      id: '/customer-service'
+      path: '/customer-service'
+      fullPath: '/customer-service'
+      preLoaderRoute: typeof CustomerServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +261,152 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/$slug': {
+      id: '/shop/$slug'
+      path: '/$slug'
+      fullPath: '/shop/$slug'
+      preLoaderRoute: typeof ShopSlugRouteImport
+      parentRoute: typeof ShopRoute
+    }
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal/our-story': {
+      id: '/journal/our-story'
+      path: '/our-story'
+      fullPath: '/journal/our-story'
+      preLoaderRoute: typeof JournalOurStoryRouteImport
+      parentRoute: typeof JournalRoute
+    }
+    '/journal/$slug': {
+      id: '/journal/$slug'
+      path: '/$slug'
+      fullPath: '/journal/$slug'
+      preLoaderRoute: typeof JournalSlugRouteImport
+      parentRoute: typeof JournalRoute
+    }
+    '/customer-service/$slug': {
+      id: '/customer-service/$slug'
+      path: '/$slug'
+      fullPath: '/customer-service/$slug'
+      preLoaderRoute: typeof CustomerServiceSlugRouteImport
+      parentRoute: typeof CustomerServiceRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/journal': {
+      id: '/admin/journal'
+      path: '/journal'
+      fullPath: '/admin/journal'
+      preLoaderRoute: typeof AdminJournalRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/journal/new': {
+      id: '/admin/journal/new'
+      path: '/new'
+      fullPath: '/admin/journal/new'
+      preLoaderRoute: typeof AdminJournalNewRouteImport
+      parentRoute: typeof AdminJournalRoute
+    }
+    '/admin/journal/$id/edit': {
+      id: '/admin/journal/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/journal/$id/edit'
+      preLoaderRoute: typeof AdminJournalIdEditRouteImport
+      parentRoute: typeof AdminJournalRoute
+    }
   }
 }
 
+interface AdminJournalRouteChildren {
+  AdminJournalNewRoute: typeof AdminJournalNewRoute
+  AdminJournalIdEditRoute: typeof AdminJournalIdEditRoute
+}
+
+const AdminJournalRouteChildren: AdminJournalRouteChildren = {
+  AdminJournalNewRoute: AdminJournalNewRoute,
+  AdminJournalIdEditRoute: AdminJournalIdEditRoute,
+}
+
+const AdminJournalRouteWithChildren = AdminJournalRoute._addFileChildren(
+  AdminJournalRouteChildren,
+)
+
+interface AdminRouteChildren {
+  AdminJournalRoute: typeof AdminJournalRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminJournalRoute: AdminJournalRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface CustomerServiceRouteChildren {
+  CustomerServiceSlugRoute: typeof CustomerServiceSlugRoute
+}
+
+const CustomerServiceRouteChildren: CustomerServiceRouteChildren = {
+  CustomerServiceSlugRoute: CustomerServiceSlugRoute,
+}
+
+const CustomerServiceRouteWithChildren = CustomerServiceRoute._addFileChildren(
+  CustomerServiceRouteChildren,
+)
+
+interface JournalRouteChildren {
+  JournalSlugRoute: typeof JournalSlugRoute
+  JournalOurStoryRoute: typeof JournalOurStoryRoute
+}
+
+const JournalRouteChildren: JournalRouteChildren = {
+  JournalSlugRoute: JournalSlugRoute,
+  JournalOurStoryRoute: JournalOurStoryRoute,
+}
+
+const JournalRouteWithChildren =
+  JournalRoute._addFileChildren(JournalRouteChildren)
+
+interface ShopRouteChildren {
+  ShopSlugRoute: typeof ShopSlugRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopSlugRoute: ShopSlugRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  CartRoute: CartRoute,
+  CustomerServiceRoute: CustomerServiceRouteWithChildren,
+  JournalRoute: JournalRouteWithChildren,
+  ShopRoute: ShopRouteWithChildren,
+  ProductSlugRoute: ProductSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
