@@ -8,7 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "build:hostinger": "NITRO_PRESET=node-server vite build",
-    "start": "node hostinger-server.js",
+    "start": "npm run build:hostinger && node hostinger-server.js",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."

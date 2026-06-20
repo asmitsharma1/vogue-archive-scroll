@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,6 +22,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const INTERNAL_PORT = process.env.INTERNAL_PORT || 3001;
 const nitroEntry = path.join(__dirname, ".output/server/index.mjs");
+
+if (!existsSync(nitroEntry)) {
+  console.error(
+    `Build output not found at ${nitroEntry}.\n` +
+      'Run "npm run build:hostinger" before starting (the "start" script does this automatically — ' +
+      "if you're invoking this file directly, build first).",
+  );
+  process.exit(1);
+}
 
 const nitro = spawn(process.execPath, [nitroEntry], {
   env: { ...process.env, PORT: String(INTERNAL_PORT) },
