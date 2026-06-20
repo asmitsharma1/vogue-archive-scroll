@@ -6,11 +6,15 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// Vercel always sets VERCEL=1 in its build containers — use that to pick
+// the right Nitro preset automatically, since Hostinger's pipeline just
+// runs the plain "npm run build" script with no way to pass NITRO_PRESET.
+// NITRO_PRESET still wins if set explicitly (e.g. local `build:hostinger`).
+const defaultPreset = process.env.VERCEL ? "vercel" : "node-server";
+
 export default defineConfig({
   nitro: {
-    // Vercel builds (no NITRO_PRESET set) stay on the "vercel" preset.
-    // Hostinger (or any plain Node host) sets NITRO_PRESET=node-server.
-    preset: process.env.NITRO_PRESET || "vercel",
+    preset: process.env.NITRO_PRESET || defaultPreset,
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
