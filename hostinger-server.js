@@ -19,11 +19,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const nitroEntry = path.join(__dirname, ".output/server/index.mjs");
 
-// hPanel's "Startup file" setting runs `node server.js` directly, not
-// `npm run start` — so the build step never ran. Self-build here instead of
-// just erroring out, otherwise the process exits immediately and Hostinger's
-// proxy reports a generic 503 with no indication a build was ever needed.
-if (!existsSync(nitroEntry)) {
+function ensureBuildTooling() {
   // Build tooling (vite, etc.) lives in devDependencies. Hosts that run
   // `npm install` with NODE_ENV=production skip those, so make sure they're
   // present before trying to build.
@@ -31,8 +27,11 @@ if (!existsSync(nitroEntry)) {
     console.log("Build tooling missing, installing devDependencies...");
     execSync("npm install --include=dev", { cwd: __dirname, stdio: "inherit" });
   }
+}
 
-  console.log(`Build output not found at ${nitroEntry}. Building now...`);
+function buildHostingerOutput(reason) {
+  ensureBuildTooling();
+  console.log(`${reason}. Building Hostinger-compatible Nitro output...`);
   try {
     execSync("npm run build:hostinger", { cwd: __dirname, stdio: "inherit" });
   } catch (error) {
@@ -41,19 +40,36 @@ if (!existsSync(nitroEntry)) {
   }
 }
 
+async function loadNitroEntry() {
+  return import(`${pathToFileURL(nitroEntry).href}?t=${Date.now()}`);
+}
+
+// hPanel's "Startup file" setting runs `node server.js` directly, not
+// `npm run start` — so the build step never ran. Self-build here instead of
+// just erroring out, otherwise the process exits immediately and Hostinger's
+// proxy reports a generic 503 with no indication a build was ever needed.
+if (!existsSync(nitroEntry)) {
+  buildHostingerOutput(`Build output not found at ${nitroEntry}`);
+}
+
 if (!existsSync(nitroEntry)) {
   console.error(`Build still missing at ${nitroEntry} after build:hostinger ran.`);
   process.exit(1);
 }
 
-const nitro = await import(pathToFileURL(nitroEntry).href);
-const nitroMiddleware = nitro.middleware;
+let nitro = await loadNitroEntry();
+let nitroMiddleware = nitro.middleware;
 
 if (typeof nitroMiddleware !== "function") {
-  console.error(
-    `Nitro middleware was not exported from ${nitroEntry}.\n` +
-      'Build with "npm run build:hostinger" so Nitro uses the node-middleware preset.',
+  buildHostingerOutput(
+    `Nitro middleware was not exported from ${nitroEntry}; existing output likely used the wrong preset`,
   );
+  nitro = await loadNitroEntry();
+  nitroMiddleware = nitro.middleware;
+}
+
+if (typeof nitroMiddleware !== "function") {
+  console.error(`Nitro middleware was still not exported from ${nitroEntry} after rebuilding.`);
   process.exit(1);
 }
 
