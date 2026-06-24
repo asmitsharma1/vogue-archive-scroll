@@ -59,10 +59,19 @@ if (typeof nitroMiddleware !== "function") {
 
 const app = express();
 
+app.get("/healthz", (_req, res) => {
+  res.status(200).type("text/plain").send("ok");
+});
+
 app.use(nitroMiddleware);
 
 const server = app.listen(PORT, () => {
   console.log(`Express entry listening on :${PORT}, serving TanStack Start via Nitro middleware`);
+});
+
+server.on("error", (error) => {
+  console.error("Express server failed to start:", error);
+  process.exit(1);
 });
 
 if (typeof nitro.handleUpgrade === "function") {

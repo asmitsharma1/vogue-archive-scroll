@@ -52,7 +52,12 @@ export const Route = createFileRoute("/shop")({
 });
 
 function ShopCatalogPage() {
-  const { products, total, totalPages } = Route.useLoaderData();
+  const loaderData = Route.useLoaderData();
+  const { products, total, totalPages } = loaderData ?? {
+    products: [],
+    total: 0,
+    totalPages: 1,
+  };
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
 
