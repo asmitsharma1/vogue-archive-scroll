@@ -9,12 +9,18 @@ export type StoreConfig = {
   checkoutBaseUrl: string;
 };
 
+// One shared WooCommerce catalog lives at store.luxeholic.com.au (the only
+// hostname with the wc/v3 REST API actually registered — store.luxeholic.in
+// is plain WordPress with no WooCommerce installed). All three regions read
+// from the same apiUrl; checkoutBaseUrl stays per-region for redirects.
+const CATALOG_API_URL = "https://store.luxeholic.com.au/wp-json/wc/v3";
+
 const INDIA_STORE: StoreConfig = {
   currency: "INR",
   symbol: "₹",
   country: "IN",
   label: "India",
-  apiUrl: "https://store.luxeholic.in/wp-json/wc/v3",
+  apiUrl: CATALOG_API_URL,
   checkoutBaseUrl: "https://store.luxeholic.in",
 };
 
@@ -23,7 +29,7 @@ const AUSTRALIA_STORE: StoreConfig = {
   symbol: "A$",
   country: "AU",
   label: "Australia",
-  apiUrl: "https://au.luxeholic.in/wp-json/wc/v3",
+  apiUrl: CATALOG_API_URL,
   checkoutBaseUrl: "https://au.luxeholic.in",
 };
 
@@ -32,7 +38,7 @@ const NEW_ZEALAND_STORE: StoreConfig = {
   symbol: "NZ$",
   country: "NZ",
   label: "New Zealand",
-  apiUrl: "https://nz.luxeholic.in/wp-json/wc/v3",
+  apiUrl: CATALOG_API_URL,
   checkoutBaseUrl: "https://nz.luxeholic.in",
 };
 
