@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -18,12 +19,30 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const nitroEntry = path.join(__dirname, ".output/server/index.mjs");
 
+// hPanel's "Startup file" setting runs `node server.js` directly, not
+// `npm run start` — so the build step never ran. Self-build here instead of
+// just erroring out, otherwise the process exits immediately and Hostinger's
+// proxy reports a generic 503 with no indication a build was ever needed.
 if (!existsSync(nitroEntry)) {
-  console.error(
-    `Build output not found at ${nitroEntry}.\n` +
-      'Run "npm run build:hostinger" before starting (the "start" script does this automatically — ' +
-      "if you're invoking this file directly, build first).",
-  );
+  // Build tooling (vite, etc.) lives in devDependencies. Hosts that run
+  // `npm install` with NODE_ENV=production skip those, so make sure they're
+  // present before trying to build.
+  if (!existsSync(path.join(__dirname, "node_modules", "vite"))) {
+    console.log("Build tooling missing, installing devDependencies...");
+    execSync("npm install --include=dev", { cwd: __dirname, stdio: "inherit" });
+  }
+
+  console.log(`Build output not found at ${nitroEntry}. Building now...`);
+  try {
+    execSync("npm run build:hostinger", { cwd: __dirname, stdio: "inherit" });
+  } catch (error) {
+    console.error("Build failed:", error);
+    process.exit(1);
+  }
+}
+
+if (!existsSync(nitroEntry)) {
+  console.error(`Build still missing at ${nitroEntry} after build:hostinger ran.`);
   process.exit(1);
 }
 
