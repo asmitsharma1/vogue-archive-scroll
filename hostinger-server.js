@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -19,57 +18,26 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const nitroEntry = path.join(__dirname, ".output/server/index.mjs");
 
-function ensureBuildTooling() {
-  // Build tooling (vite, etc.) lives in devDependencies. Hosts that run
-  // `npm install` with NODE_ENV=production skip those, so make sure they're
-  // present before trying to build.
-  if (!existsSync(path.join(__dirname, "node_modules", "vite"))) {
-    console.log("Build tooling missing, installing devDependencies...");
-    execSync("npm install --include=dev", { cwd: __dirname, stdio: "inherit" });
-  }
-}
-
-function buildHostingerOutput(reason) {
-  ensureBuildTooling();
-  console.log(`${reason}. Building Hostinger-compatible Nitro output...`);
-  try {
-    execSync("npm run build:hostinger", { cwd: __dirname, stdio: "inherit" });
-  } catch (error) {
-    console.error("Build failed:", error);
-    process.exit(1);
-  }
-}
-
 async function loadNitroEntry() {
-  return import(`${pathToFileURL(nitroEntry).href}?t=${Date.now()}`);
+  return import(pathToFileURL(nitroEntry).href);
 }
 
-// hPanel's "Startup file" setting runs `node server.js` directly, not
-// `npm run start` — so the build step never ran. Self-build here instead of
-// just erroring out, otherwise the process exits immediately and Hostinger's
-// proxy reports a generic 503 with no indication a build was ever needed.
+// Keep runtime startup cheap. Hostinger shared hosting has strict process
+// limits, so builds and installs must happen in the deploy/build step only.
 if (!existsSync(nitroEntry)) {
-  buildHostingerOutput(`Build output not found at ${nitroEntry}`);
-}
-
-if (!existsSync(nitroEntry)) {
-  console.error(`Build still missing at ${nitroEntry} after build:hostinger ran.`);
+  console.error(
+    `Build output missing at ${nitroEntry}. Run "npm run build" during deploy before starting server.js.`,
+  );
   process.exit(1);
 }
 
-let nitro = await loadNitroEntry();
-let nitroMiddleware = nitro.middleware;
+const nitro = await loadNitroEntry();
+const nitroMiddleware = nitro.middleware;
 
 if (typeof nitroMiddleware !== "function") {
-  buildHostingerOutput(
-    `Nitro middleware was not exported from ${nitroEntry}; existing output likely used the wrong preset`,
+  console.error(
+    `Nitro middleware was not exported from ${nitroEntry}. Rebuild with "npm run build" so Nitro uses the node-middleware preset.`,
   );
-  nitro = await loadNitroEntry();
-  nitroMiddleware = nitro.middleware;
-}
-
-if (typeof nitroMiddleware !== "function") {
-  console.error(`Nitro middleware was still not exported from ${nitroEntry} after rebuilding.`);
   process.exit(1);
 }
 
